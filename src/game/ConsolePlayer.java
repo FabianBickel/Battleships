@@ -25,4 +25,8 @@ public class ConsolePlayer implements Player{
         }
         return new Point(x, y);
     }
+
+    public void sendErrorMessage(String message) {
+        System.out.println(message);
+    }
 }

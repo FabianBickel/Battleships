@@ -52,9 +52,18 @@ public class GameManager {
     private static void startGameLoop() throws Exception {
         while (true) {
             drawPlayingField();
-            Point2D point = player.nextShot();
+            playersTurn();
+        }
+    }
+
+    private static void playersTurn() {
+        Point2D point;
+        try {
+            point = player.nextShot();
             System.out.println("X: " + point.getX() + " Y: " + point.getY());
             playingField[(int)point.getX()][(int)point.getY()].shoot();
+        } catch (Exception e) {
+            player.sendErrorMessage("Input invalid! Please try again!");
         }
     }
 
@@ -65,31 +74,35 @@ public class GameManager {
             for (int column = 0; column < PLAYING_FIELD_SIZE; column++) {
                 Tile tile = playingField[row][column];
                 String className = tile.getClass().getName();
-                char symbol;
-                char ocean;
-                char ship;
-                if (tile.getShotState()) {
-                    ocean = 'O';
-                    ship = 'X';
-                } else {
-                    ocean = '~';
-                    ship = '~';
-                }
-                switch (className) {
-                    case "game.Ocean":
-                        symbol = ocean;
-                        break;
-                    case "game.Ship":
-                        symbol = ship;
-                        break;
-                    default:
-                        throw new Exception("No Symbol defined for Tile");
-                }
-
+                char symbol = getTileSymbol(tile, className);
                 System.out.print(symbol + "|");
             }
             System.out.println();
         }
+    }
+
+    private static char getTileSymbol(Tile tile, String className) throws Exception {
+        char symbol;
+        char ocean;
+        char ship;
+        if (tile.getShotState()) {
+            ocean = 'O';
+            ship = 'X';
+        } else {
+            ocean = '~';
+            ship = '~';
+        }
+        switch (className) {
+            case "game.Ocean":
+                symbol = ocean;
+                break;
+            case "game.Ship":
+                symbol = ship;
+                break;
+            default:
+                throw new Exception("No Symbol defined for Tile");
+        }
+        return symbol;
     }
 
     private static void drawXAxis() {
