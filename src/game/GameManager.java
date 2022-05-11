@@ -5,7 +5,6 @@ import java.util.Random;
 
 public class GameManager {
     final public static int PLAYING_FIELD_SIZE = 10;
-    final public static int[] SHIP_LENGTHS = { 2, 2, 3, 3, 4, 4 };
 
     public static Random random = new Random();
 
@@ -20,55 +19,30 @@ public class GameManager {
 
     private static void setupPlayingField() {
         playingField = new Tile[PLAYING_FIELD_SIZE][PLAYING_FIELD_SIZE];
-        fillWithOcean();
-        Ship[] ships = getShips();
-        placeShips(ships);
+        placeShips();
     }
 
-    private static void fillWithOcean() {
-        for (int row = 0; row < PLAYING_FIELD_SIZE; row++) {
-            for (int column = 0; column < PLAYING_FIELD_SIZE; column++) {
-                playingField[row][column] = new OceanTile();
-            }
-        }
+    private static void placeShips() {
+        playingField = new Tile[][] {
+            { o(),o(),o(),o(),o(),o(),o(),o(),o(),o() },
+            { o(),s(),o(),o(),o(),o(),o(),o(),o(),o() },
+            { o(),s(),o(),o(),o(),s(),s(),s(),s(),o() },
+            { o(),s(),o(),o(),o(),o(),o(),o(),o(),o() },
+            { o(),o(),o(),o(),o(),s(),s(),o(),o(),o() },
+            { o(),o(),o(),o(),o(),o(),o(),o(),o(),o() },
+            { o(),o(),o(),o(),s(),o(),o(),o(),s(),o() },
+            { o(),o(),o(),o(),s(),o(),o(),o(),s(),o() },
+            { o(),o(),o(),o(),s(),o(),o(),o(),o(),o() },
+            { o(),o(),o(),o(),o(),o(),s(),s(),s(),s() }
+        };
     }
 
-    private static Ship[] getShips() {
-        Ship[] shipArray = new Ship[SHIP_LENGTHS.length];
-        for (int i = 0; i < shipArray.length; i++) {
-            Ship ship = new Ship(SHIP_LENGTHS[i]);
-            ship.isVertical = random.nextBoolean();
-            shipArray[i] = ship;
-        }
-        return shipArray;
+    private static Ocean o() {
+        return new Ocean();
     }
-
-    private static void placeShips(Ship[] shipArray) {
-        for (int i = 0; i < shipArray.length; i++) {
-            Ship ship = shipArray[i];
-            while (true) {
-                int x = random.nextInt(PLAYING_FIELD_SIZE);
-                int y = random.nextInt(PLAYING_FIELD_SIZE);
-                if (ship.isVertical) {
-                    if ((y + ship.length - 1) >= PLAYING_FIELD_SIZE) {
-                        continue;
-                    }
-                } else {
-                    if ((x + ship.length - 1) >= PLAYING_FIELD_SIZE) {
-                        continue;
-                    }
-                }
-                for (int addLength = 0; addLength < ship.length; addLength++) {
-                    if (!ship.isVertical) {
-                        playingField[x + addLength][y] = new ShipTile();
-                    } else {
-
-                        playingField[x][y + addLength] = new ShipTile();
-                    }
-                }
-                break;
-            }
-        }
+    
+    private static Ship s() {
+        return new Ship();
     }
 
     private static void setupPlayer() {
@@ -115,14 +89,14 @@ public class GameManager {
             ocean = 'O';
             ship = 'X';
         } else {
-            ocean = 'o';
-            ship = 'x';
+            ocean = '~';
+            ship = '~';
         }
         switch (className) {
-            case "game.OceanTile":
+            case "game.Ocean":
                 symbol = ocean;
                 break;
-            case "game.ShipTile":
+            case "game.Ship":
                 symbol = ship;
                 break;
             default:
