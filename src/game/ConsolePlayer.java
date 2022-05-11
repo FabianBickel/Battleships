@@ -14,7 +14,7 @@ public class ConsolePlayer implements Player{
 
     public Point2D nextShot() {
         System.out.print("Please enter the coordinates of your next shot (ex. B4): ");
-        String input = scanner.next().toUpperCase();
+        String input = scanner.next().toUpperCase().trim();
         String coordinatesY = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         int x;
         int y = coordinatesY.indexOf((int)input.charAt(0));
@@ -24,5 +24,9 @@ public class ConsolePlayer implements Player{
             throw new InputMismatchException("Substring from index 1 of input cannot be parsed as integer");
         }
         return new Point(x, y);
+    }
+
+    public void sendErrorMessage(String message) {
+        System.out.println(message);
     }
 }
