@@ -1,18 +1,16 @@
 package game;
 
-public class Ship implements Tile{
-    
-    private boolean shot;
+public class Ship {
+    public int length;
+    public boolean isVertical;
 
-    public Ship() {
-        this.shot = false;
+    public Ship(int length) {
+        this.length = length;
+        this.isVertical = false;
     }
 
-    public void shoot() {
-        this.shot = true;
-    }
-
-    public boolean getShotState() {
-        return shot;
+    public Ship(int length, boolean isVertical) {
+        this.length = length;
+        this.isVertical = isVertical;
     }
 }

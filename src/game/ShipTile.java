@@ -1,10 +1,10 @@
 package game;
 
-public class Ocean implements Tile{
-
+public class ShipTile implements Tile{
+    
     private boolean shot;
 
-    public Ocean() {
+    public ShipTile() {
         this.shot = false;
     }
 
