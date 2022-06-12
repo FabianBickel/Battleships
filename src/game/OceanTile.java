@@ -9,6 +9,7 @@ public class OceanTile implements Tile{
 
     public OceanTile() {
         this.shot = false;
+        this.occupied = false;
     }
 
     public void shoot() {
@@ -27,8 +28,8 @@ public class OceanTile implements Tile{
         return occupied;
     }
 
-    public void setOccupied (boolean value) {
-        this.occupied = value;
+    public void occupie () {
+        this.occupied = true;
     }
 
     public static boolean checkIfOceanTile(Tile tile) {
