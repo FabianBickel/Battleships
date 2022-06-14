@@ -130,4 +130,11 @@ public class ConsolePlayer implements Player {
     public void informSunkShip() {
         System.out.println("\u001B[32m" + "Nice shot! You sunk the ship!" + "\u001B[0m");
     }
+
+    public void sendInstrucionManual() {
+        System.out.println();
+        System.out.println("\"B4\" - shoot at coordinate B4");
+        System.out.println("\" ?\" - unhide remaining ships");
+        System.out.println("\"-1\" - end the game");
+    }
 }

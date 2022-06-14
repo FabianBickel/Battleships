@@ -12,7 +12,6 @@ public class GameManager {
     private static Random random = new Random();
 
     private static Tile[][] playingField;
-    private static Ship[] ships = new Ship[SHIP_LENGTHS.length];
     private static Player player;
 
     private static int shotCount = 0;
@@ -23,6 +22,7 @@ public class GameManager {
         player.sendLog("Setting up playing field...");
         setupPlayingField();
         player.sendLog("Starting game...");
+        player.sendInstrucionManual();
         startGameLoop();
     }
 
@@ -34,18 +34,14 @@ public class GameManager {
         playingField = new Tile[PLAYING_FIELD_SIZE][PLAYING_FIELD_SIZE];
         fillWithOcean(playingField);
         player.sendLog("Generating ships...");
-        tryGetShips();
-        placeShips(ships);
-    }
-
-    private static void tryGetShips() {
-        int attempt = 0;
-        while (attempt < 100) {
+        while (true) {
             try {
-                ships = getShips();
+                placeShips();
                 break;
-            } catch (TimeoutException e) {}
-            attempt++;
+            } catch (TimeoutException e) {
+                fillWithOcean(playingField);
+                continue;
+            }
         }
     }
 
@@ -62,7 +58,7 @@ public class GameManager {
             try {
                 player.drawPlayingField(playingField, false);
                 playersTurn();
-                if (sunkCount == (SHIP_LENGTHS.length - 1)) {
+                if (sunkCount >= (SHIP_LENGTHS.length)) {
                     throw new PlayerWonException();
                 }
             } catch (TerminateGameException e) {
@@ -70,6 +66,7 @@ public class GameManager {
                 break;
             } catch (PlayerWonException e) {
                 player.sendMessage("Congratulations! You won the game!\nYou took " + shotCount + " shots to destroy " + sunkCount + " ships.");
+                break;
             }
         }
     }
@@ -79,14 +76,17 @@ public class GameManager {
         while (true) {
             try {
                 point = player.nextShot(playingField);
-                if (point.getX() >= PLAYING_FIELD_SIZE || point.getY() >= PLAYING_FIELD_SIZE) {
+                int x = (int)point.getX();
+                int y = (int)point.getY();
+                int max = PLAYING_FIELD_SIZE;
+                if (x >= max || y >= max || x < 0 || y < 0) {
                     throw new IllegalArgumentException("Coordinates (" + point.getX() + "|" + point.getY() + " are out of bounds!");
                 }
             } catch (InputMismatchException e) {
                 player.sendErrorMessage("Input invalid! Please try again!");
                 continue;
             } catch (IllegalArgumentException e) {
-                player.sendErrorMessage("Coordinates are out of bounds!");
+                player.sendErrorMessage("Coordinates are invalid!");
                 continue;
             }
             Tile tile = getTileFromPoint(point);
@@ -127,78 +127,53 @@ public class GameManager {
         }
     }
 
-    private static Ship[] getShips() throws TimeoutException {
-        Ship[] shipArray = new Ship[SHIP_LENGTHS.length];
-        for (int i = 0; i < shipArray.length; i++) {
-            Ship ship;
-            int shipLength = SHIP_LENGTHS[i];
-            int attempt = 0;
-            do {
-                if (attempt >= 100) {
-                    throw new TimeoutException("Couldn't find a suitable location for ship. There are likely too many ships to be places on the playing field.");
+    private static void placeShips() throws Exception {
+        for (int i = 0; i < SHIP_LENGTHS.length; i++) {
+            int attempts = 0;
+            while (true) {
+                if (attempts >= 100) {
+                    throw new TimeoutException("Couldn't place ship. There are likely too many ships to be places on the tile field.");
                 }
-                ship = getNewRandomShip(shipLength);
-                attempt++;
-            } while (!shipPositionValid(shipArray.clone(), ship));
-            shipArray[i] = ship;
+                Ship ship = getNewRandomShip(SHIP_LENGTHS[i]);
+                if (!shipPositionValid(ship)) {
+                    attempts++;
+                    continue;
+                }
+                placeShipOnPlayingField(ship);
+                occupieTilesAroundShip(ship);
+                break;
+            }
         }
-        return shipArray;
     }
 
     private static Ship getNewRandomShip(int length) {
-        int row;
-        int column;
-        boolean isVertical;
-        Ship ship;
-        row = random.nextInt(PLAYING_FIELD_SIZE);
-        column = random.nextInt(PLAYING_FIELD_SIZE);
-        isVertical = random.nextBoolean();
-        ship = new Ship(column, row, length, isVertical);
+        random = new Random();
+        int x = random.nextInt(PLAYING_FIELD_SIZE);
+        int y = random.nextInt(PLAYING_FIELD_SIZE);
+        boolean isVertical = random.nextBoolean();
+        Ship ship = new Ship(x, y, length, isVertical);
         return ship;
-    }    
-    
-    private static boolean shipPositionValid(Ship[] shipArray, Ship ship) {
-        Point pointStart = ship.getMinPoint();
-        Point pointEnd = ship.getMaxPoint();
-        if (!shipInBounds(ship)) {
-            return false;
-        } else if (pointOccupiedInShipArray(pointStart, shipArray) || pointOccupiedInShipArray(pointEnd, shipArray)) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
-    private static boolean shipInBounds(Ship ship) {
-        int row = ship.getMinY();
-        int column = ship.getMinX();
-        if (ship.getIsVertical() && ((row + (ship.getLength() - 1)) >= playingField.length)) {
-            return false;
-        } else if (!ship.getIsVertical() && (column + (ship.getLength() - 1)) >= playingField.length) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private static boolean pointOccupiedInShipArray(Point point, Ship[] shipArray) {
-        System.out.print("");
-        for (Ship ship : shipArray) {
-            if (ship == null) {
-                continue;
-            } else if (ship.occupiedAreaContains(point)) {
-                return true;
+    private static boolean shipPositionValid(Ship ship) {
+        boolean isVertical = ship.getIsVertical();
+        int coordStart = isVertical ? ship.getMinY() : ship.getMinX();
+        int coordEnd = isVertical ? ship.getMaxY() : ship.getMaxX();
+        for (int i = coordStart; i <= coordEnd; i++) {
+            if (i >= PLAYING_FIELD_SIZE) {
+                return false;
+            } else if (isVertical) {
+                if (playingField[i][ship.getMinX()].getOccupied()) {
+                    return false;
+                }
+            } else {
+                if (playingField[ship.getMinY()][i].getOccupied()) {
+                    return false;
+                }
             }
         }
-        return false;
+        return true;
     }
-
-    private static void placeShips(Ship[] shipArray) throws Exception {
-        for (Ship ship : shipArray) {
-            placeShipOnPlayingField(ship);
-            occupieTilesAroundShip(ship);
-        }
-    }    
     
     private static void placeShipOnPlayingField(Ship ship) {
         int row = ship.getMinY();

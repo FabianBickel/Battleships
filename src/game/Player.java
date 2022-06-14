@@ -7,6 +7,7 @@ public interface Player {
     public void sendLog(String message);
     public void sendMessage(String message);
     public void sendErrorMessage(String message);
+    public void sendInstrucionManual();
     public void informHitOcean();
     public void informHitShip();
     public void informSunkShip();
