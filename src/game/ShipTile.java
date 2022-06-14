@@ -4,17 +4,19 @@ public class ShipTile implements Tile{
     
     private boolean shot;
     private boolean occupied;
+    public Ship parentShip;
 
-    public ShipTile() {
+    public ShipTile(Ship parentShip) {
         this.shot = false;
         this.occupied = true;
+        this.parentShip = parentShip;
     }
 
     public void shoot() {
         this.shot = true;
     }
 
-    public boolean getShot() {
+    public boolean getShotState() {
         return shot;
     }
 
@@ -24,5 +26,9 @@ public class ShipTile implements Tile{
 
     public boolean getOccupied() {
         return occupied;
+    }
+
+    public Ship getParentShip() {
+        return parentShip;
     }
 }

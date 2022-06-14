@@ -1,7 +1,5 @@
 package game;
 
-import java.lang.invoke.MethodHandles;
-
 public class OceanTile implements Tile{
 
     private boolean shot;
@@ -16,7 +14,7 @@ public class OceanTile implements Tile{
         this.shot = true;
     }
 
-    public boolean getShot() {
+    public boolean getShotState() {
         return shot;
     }
 

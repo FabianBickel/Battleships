@@ -1,9 +1,14 @@
 package game;
 
-import java.awt.geom.Point2D;
+import java.awt.Point;
 
 public interface Player {
-    public Point2D nextShot();
+    public Point nextShot(Tile[][] tileField) throws TerminateGameException;
+    public void sendLog(String message);
+    public void sendMessage(String message);
     public void sendErrorMessage(String message);
-    public void drawPlayingField(Tile[][] tileField) throws Exception;
+    public void informHitOcean();
+    public void informHitShip();
+    public void informSunkShip();
+    public void drawPlayingField(Tile[][] tileField, boolean shipsVisible) throws Exception;
 }
