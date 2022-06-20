@@ -2,6 +2,10 @@ package tiles;
 
 import game.*;
 
+import game.*;
+import tiles.*;
+import players.*;
+
 public class ShipTile implements Tile{
     
     private boolean shot;

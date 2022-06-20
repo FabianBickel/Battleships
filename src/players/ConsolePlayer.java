@@ -3,6 +3,10 @@ package players;
 import game.*;
 import tiles.*;
 
+import game.*;
+import tiles.*;
+import players.*;
+
 import java.awt.Point;
 import java.util.InputMismatchException;
 import java.util.Scanner;

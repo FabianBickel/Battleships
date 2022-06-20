@@ -1,5 +1,9 @@
 package tiles;
 
+import game.*;
+import tiles.*;
+import players.*;
+
 public class OceanTile implements Tile{
 
     private boolean shot;

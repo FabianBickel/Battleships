@@ -1,5 +1,6 @@
 package game;
 
+import game.*;
 import tiles.*;
 import players.*;
 
