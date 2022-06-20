@@ -1,4 +1,4 @@
-package game;
+package tiles;
 
 public interface Tile {
     public void shoot();

@@ -1,4 +1,7 @@
-package game;
+package players;
+
+import game.*;
+import tiles.*;
 
 import java.awt.Point;
 import java.util.InputMismatchException;

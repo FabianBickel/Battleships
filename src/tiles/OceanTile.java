@@ -1,4 +1,4 @@
-package game;
+package tiles;
 
 public class OceanTile implements Tile{
 

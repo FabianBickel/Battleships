@@ -1,7 +1,8 @@
 package game;
 
+import tiles.*;
+
 import java.awt.Point;
-import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Rectangle;

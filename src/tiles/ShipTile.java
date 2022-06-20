@@ -1,4 +1,6 @@
-package game;
+package tiles;
+
+import game.*;
 
 public class ShipTile implements Tile{
     
