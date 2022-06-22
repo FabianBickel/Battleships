@@ -3,27 +3,25 @@ package players;
 import game.*;
 import tiles.*;
 
-import game.*;
-import tiles.*;
-import players.*;
-
 import java.awt.Point;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class ConsolePlayer implements Player {
+import exceptions.TerminateGameException;
+
+public class ConsolePlayer implements PlayerInterface {
     public Scanner scanner;
 
     public ConsolePlayer() {
         this.scanner = new Scanner(System.in);
     }
 
-    public Point nextShot(Tile[][] tileField) throws TerminateGameException {
+    public Point waitForNextShot(Tile[][] tileField) throws TerminateGameException {
         String input = getAndPreProcessInput(tileField);
         String coordinatesColumn = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int row = getIntegerFromInputString(input);
-        int column = coordinatesColumn.indexOf((int)input.charAt(0));
-        return new Point(row, column);
+        int x = coordinatesColumn.indexOf((int)input.charAt(0));
+        int y = getIntegerFromInputString(input);
+        return new Point(x, y);
     }
 
     private int getIntegerFromInputString(String input) {
@@ -47,6 +45,8 @@ public class ConsolePlayer implements Player {
             } else if (input.equals("?")) {
                 drawPlayingField(tileField, true);
                 continue;
+            } else {
+                drawPlayingField(tileField, false);
             }
             break;
         }
@@ -67,7 +67,7 @@ public class ConsolePlayer implements Player {
         System.out.println("\u001B[31m" + message + "\u001B[0m");
     }
 
-    public void drawPlayingField(Tile[][] tileField, boolean shipsVisible) {
+    private void drawPlayingField(Tile[][] tileField, boolean shipsVisible) {
         System.out.println("\n------------------------\n");
         drawSpaces(0 + 1, tileField.length);
         drawColumnNaming(tileField.length);

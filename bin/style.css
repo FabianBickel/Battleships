@@ -1,0 +1,17 @@
+.tile {
+    -fx-fill: transparent;
+    -fx-height: 48px;
+    -fx-width: 48px;
+}
+
+GridPane {
+    -fx-alignment: center;
+    -fx-background-color: blue;
+    -fx-background-image: url(ocean.gif);
+    -fx-background-position: center;
+    -fx-background-size: 144px;
+}
+
+ButtonBar {
+    -fx-padding: 8px;
+}

@@ -1,4 +1,4 @@
-package game;
+package exceptions;
 
 public class TerminateGameException extends Exception {
     public TerminateGameException() {

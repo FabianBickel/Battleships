@@ -1,6 +1,5 @@
 package game;
 
-import game.*;
 import tiles.*;
 import players.*;
 
@@ -9,6 +8,9 @@ import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
+import exceptions.PlayerWonException;
+import exceptions.TerminateGameException;
+
 public class GameManager {
     final private static int PLAYING_FIELD_SIZE = 10;
     final private static int[] SHIP_LENGTHS = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
@@ -16,10 +18,14 @@ public class GameManager {
     private static Random random = new Random();
 
     private static Tile[][] playingField;
-    private static Player player;
+    private static PlayerInterface player;
 
     private static int shotCount = 0;
     private static int sunkCount = 0;
+
+    public static void shoot(int x, int y) {
+        System.out.println("X: " + x + ", Y: " + y);
+    }
 
     public static void newGame() throws Exception {
         setupPlayer();
@@ -60,7 +66,6 @@ public class GameManager {
     private static void startGameLoop() throws Exception {
         while (true) {
             try {
-                player.drawPlayingField(playingField, false);
                 playersTurn();
                 if (sunkCount >= (SHIP_LENGTHS.length)) {
                     throw new PlayerWonException();
@@ -79,7 +84,7 @@ public class GameManager {
         Point point;
         while (true) {
             try {
-                point = player.nextShot(playingField);
+                point = player.waitForNextShot(playingField);
                 int x = (int)point.getX();
                 int y = (int)point.getY();
                 int max = PLAYING_FIELD_SIZE;
@@ -87,10 +92,10 @@ public class GameManager {
                     throw new IllegalArgumentException("Coordinates (" + point.getX() + "|" + point.getY() + " are out of bounds!");
                 }
             } catch (InputMismatchException e) {
-                player.sendErrorMessage("Input invalid! Please try again!");
+                player.sendErrorMessage(e.getMessage());
                 continue;
             } catch (IllegalArgumentException e) {
-                player.sendErrorMessage("Coordinates are invalid!");
+                player.sendErrorMessage(e.getMessage());
                 continue;
             }
             Tile tile = getTileFromPoint(point);
@@ -108,13 +113,12 @@ public class GameManager {
                 sinkShipIfDestroyed(tile);
                 break;
             }
-
         }
     }
 
     private static Tile getTileFromPoint(Point point) {
-        int row = (int)point.getX();
-        int column = (int)point.getY();
+        int row = (int)point.getY();
+        int column = (int)point.getX();
         Tile tile = playingField[row][column];
         return tile;
     }
