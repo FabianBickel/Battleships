@@ -1,8 +1,6 @@
-import javafx.beans.property.BooleanProperty;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 
 public class Tile extends Rectangle {
@@ -27,6 +25,9 @@ public class Tile extends Rectangle {
     }
 
     public void shoot() {
+        if (getShotState()) {
+            return;
+        }
         unlock();
         if (occupied) {
             setFill(getHitImagePattern());
@@ -55,50 +56,25 @@ public class Tile extends Rectangle {
     }
 
     public void lockIn() {
-        mark("-fx-fill: rgba(255, 255, 255, 0.5);");
+        setStyle("-fx-fill: rgba(255, 255, 255, 0.5);");
         lockedIn = true;
     }
 
     public void unlock() {
         lockedIn = false;
-        mark("-fx-fill: rgba(255, 255, 255, 0);");
+        setFill(Color.TRANSPARENT);
     }
 
     public void hover() {
-        mark("-fx-fill: rgba(255, 255, 255, 0.25);");
+        setStyle("-fx-fill: rgba(255, 255, 255, 0.25);");
     }
 
     public void unhover() {
-        mark("-fx-fill: rgba(255, 255, 255, 0);");
-    }
-
-    private void mark(String css) {
-        if (getShotState()) {
-            System.out.println("Tile cannot be marked because it is shot.");
-        } else if (getLockedInState()) {
-            System.out.println("Tile cannot be marked because it is locked in");
-        } else {
-            setStyle(css);
-        }
+        setStyle("-fx-fill: rgba(255, 255, 255, 0);");
     }
 
     private boolean getLockedInState() {
         return lockedIn;
-    }
-
-    private void mark(Image image) {
-        ImagePattern pattern = new ImagePattern(image);
-        mark(pattern);
-    }
-
-    public void mark(Paint paint) {
-        if (getShotState()) {
-            System.out.println("Tile cannot be marked because it is shot.");
-        } else if (getLockedInState()) {
-            System.out.println("Tile cannot be marked because it is locked in");
-        } else {
-            setFill(paint);
-        }
     }
 
     public boolean getShotState() {

@@ -1,46 +1,45 @@
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 
 import javafx.application.Application;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.EventHandler;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.ImageCursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class App extends Application {
 
-    final private static int PLAYING_FIELD_SIZE = 10;
-    final private static int TILE_SIZE = 48;
-    final private static int[] SHIP_LENGTHS = {1, 1, 1, 1, 2, 2, 2, 3, 3, 4};
+    final private static int PLAYING_FIELD_SIZE = 9;
+    final private static int[] SHIP_LENGTHS = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
+    final private static int SHOT_COUNT_TARGET = getShotCountTarget();
 
     PlayingField playingField;
 
     public static void main(String[] args) throws Exception {
-        if (!(PLAYING_FIELD_SIZE < 20)) {
-            throw new Exception("Playing field size must be smaller than 20.");
-        }
         launch();
+    }
+
+    private static int getShotCountTarget() {
+        int shotCountTarget = 0;
+        for (int shipLength : SHIP_LENGTHS) {
+            shotCountTarget += shipLength;
+        }
+        return shotCountTarget;
     }
 
     @Override
     public void start(Stage stage) throws Exception {
-        Scene scene = getScenePlay();
-        configureStage(stage, scene);
+        try {
+            Scene scene = getScenePlay();
+            configureStage(stage, scene);
+        } catch (TimeoutException e) {
+            System.out.println("Creating scene failed: \"" + e.getMessage() + '"');
+            System.exit(-1);
+        }
         stage.show();
     }
 
@@ -50,16 +49,15 @@ public class App extends Application {
         stage.setResizable(false);
     }
 
-    private Scene getScenePlay() {
+    private Scene getScenePlay() throws TimeoutException {
         Scene scene = getRootGroup();
         scene.getStylesheets().add("style.css");
         return scene;
     }
 
-    private Scene getRootGroup() {
+    private Scene getRootGroup() throws TimeoutException {
         Group root = new Group();
-        playingField = new PlayingField(480, 480, PLAYING_FIELD_SIZE, PLAYING_FIELD_SIZE);
-        fillPlayingFieldWithShips();
+        getPlayingFieldWithShips();
         VBox vBoxInGame = new VBox();
         playingField.addPlayingFieldTo(vBoxInGame);
         vBoxInGame.getChildren().add(getButtonBar());
@@ -68,19 +66,24 @@ public class App extends Application {
         return scene;
     }
 
-    private void fillPlayingFieldWithShips() {
-        Random random = new Random();
-        for (int shipLength : SHIP_LENGTHS) {
-            boolean isVertical = random.nextBoolean();
-            if (isVertical) {
-                int column = random.nextInt(PLAYING_FIELD_SIZE);
-                int row = random.nextInt(PLAYING_FIELD_SIZE - shipLength - 1);
-                playingField.addShip(column, row, 1, shipLength);
-            } else {
-                int column = random.nextInt(PLAYING_FIELD_SIZE - shipLength - 1);
-                int row = random.nextInt(PLAYING_FIELD_SIZE);
-                playingField.addShip(column, row, shipLength, 1);
+    private void getPlayingFieldWithShips() throws TimeoutException {
+        int i = 0;
+        while (true) {            
+            if (i >= 10) {
+                throw new TimeoutException("Ship could not be placed. There are likely too many ships to be placed on the playing field.");
             }
+                playingField = new PlayingField(800, 800, PLAYING_FIELD_SIZE, PLAYING_FIELD_SIZE);
+                for (int shipLength : SHIP_LENGTHS) {
+                    if (shipLength > PLAYING_FIELD_SIZE) {
+                        throw new ArrayIndexOutOfBoundsException("Ships length cannot be higher than PLAYING_FIELD_SIZE");
+                    }
+                    Random random = new Random();
+                    boolean isVertical = random.nextBoolean();
+                    int colSpan = isVertical ? 1 : shipLength;
+                    int rowSpan = isVertical ? shipLength : 1;
+                    playingField.addShip(colSpan, rowSpan);
+                }
+                break;
         }
     }
 

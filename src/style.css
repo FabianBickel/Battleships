@@ -1,7 +1,5 @@
 .tile {
     -fx-fill: transparent;
-    -fx-height: 48px;
-    -fx-width: 48px;
 }
 
 GridPane {
