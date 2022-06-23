@@ -1,9 +1,14 @@
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 
 public class Tile extends Rectangle {
+    public static boolean isClass(Node node) {
+        return node.getClass().getName().equals(Tile.class.getName());
+    }
+
     private boolean shot;
     private boolean occupied;
     private boolean lockedIn;

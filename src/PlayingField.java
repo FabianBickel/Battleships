@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Random;
 
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -11,6 +12,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 public class PlayingField{
+    public static int getColumnIndex(Tile tile) {
+        return GridPane.getColumnIndex(tile);
+    }
+
+    public static int getRowIndex(Tile tile) {
+        return GridPane.getRowIndex(tile);
+    }
 
     private final int COLUMN_COUNT;
     private final int ROW_COUNT;
@@ -63,43 +71,12 @@ public class PlayingField{
         return tile;
     }
 
-    public void addShip(int colSpan, int rowSpan) {
-        boolean[][] occupationMap = new boolean[COLUMN_COUNT][ROW_COUNT];
-        for (Node node : gridPane.getChildren()) {
-            if (node.getClass().getName().equals(Tile.class.getName())) {
-                Tile tile = (Tile) node;
-                int col = PlayingField.getColumnIndex(tile);
-                int row = PlayingField.getRowIndex(tile);
-                occupationMap[col][row] = tile.getOccupied();
-            }
-        }
-        ArrayList<Point2D> validPoints = new ArrayList<Point2D>();
-        int maxCol = COLUMN_COUNT - colSpan + 1;
-        int maxRow = ROW_COUNT - rowSpan + 1;
-        for (int col = 0; col < maxCol; col++) {
-            for (int row = 0; row < maxRow; row++) {
-                if (!occupationMap[col][row]) {
-                    int colStart = Math.max(0, col - 1);
-                    int rowStart = Math.max(0, row - 1);
-                    int colEnd = Math.min(COLUMN_COUNT, col + colSpan + 1);
-                    int rowEnd = Math.min(ROW_COUNT, row + rowSpan + 1);
-                    boolean valid = true;
-                    for (int projectedCol = colStart; projectedCol < colEnd; projectedCol++) {
-                        for (int projectedRow = rowStart; projectedRow < rowEnd; projectedRow++) {
-                            if (occupationMap[projectedCol][projectedRow]) {
-                                valid = false;
-                            }
-                        }
-                    }
-                    if (valid) {
-                        validPoints.add(new Point2D(col, row));
-                    }
-                }
-            }
-        }
+    public void addShip(ShipShape shipShape) {
+
+        ArrayList<Point2D> validPoints = Ship.getValidPoints(this, shipShape);
         Random random = new Random();
-        Point2D randomPoint = validPoints.get(random.nextInt(validPoints.size()));
-        addShip((int) randomPoint.getX(), (int) randomPoint.getY(), colSpan, rowSpan);
+        Point2D randomValidPoint = validPoints.get(random.nextInt(validPoints.size()));
+        
     }
 
     public void addShip(int columnIndex, int rowIndex, int colSpan, int rowSpan) {
@@ -128,26 +105,6 @@ public class PlayingField{
         gridPane.add(ship, columnIndex, rowIndex, colSpan, rowSpan);
         ships.add(ship);
         ship.toBack();
-    }
-
-    private boolean shipPositionValid(int columnIndex, int rowIndex, int colSpan, int rowSpan) {
-        int colStart = Math.max(0, columnIndex - 1);
-        int rowStart = Math.max(0, rowIndex - 1);
-        int colEnd = Math.min(COLUMN_COUNT, columnIndex + colSpan + 1);
-        int rowEnd = Math.min(ROW_COUNT, rowIndex + rowSpan + 1);
-        for (Node node : gridPane.getChildren()) {
-            if (node.getClass().getName().equals(Tile.class.getName())) {
-                Tile tile = (Tile) node;
-                int col = PlayingField.getColumnIndex(tile);
-                int row = PlayingField.getRowIndex(tile);
-                if (col >= colStart && col <= colEnd && row >= rowStart && row <= rowEnd) {
-                    if (tile.getOccupied()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
     }
     
     private EventHandler<MouseEvent> getEvHaTileHighlight() {
@@ -237,11 +194,15 @@ public class PlayingField{
         pane.getChildren().add(gridPane);
     }
 
-    public static int getColumnIndex(Tile tile) {
-        return GridPane.getColumnIndex(tile);
+    public ObservableList<Node> getChildren() {
+        return gridPane.getChildren();
     }
 
-    public static int getRowIndex(Tile tile) {
-        return GridPane.getRowIndex(tile);
+    public int getColumnCount() {
+        return COLUMN_COUNT;
+    }
+
+    public int getRowCount() {
+        return ROW_COUNT;
     }
 }
