@@ -66,11 +66,15 @@ public class Tile extends Rectangle {
     }
 
     public void hover() {
-        setStyle("-fx-fill: rgba(255, 255, 255, 0.25);");
+        if (!shot && !lockedIn) {
+            setStyle("-fx-fill: rgba(255, 255, 255, 0.25);");
+        }
     }
 
     public void unhover() {
-        setStyle("-fx-fill: rgba(255, 255, 255, 0);");
+        if (!shot && !lockedIn) {
+            setStyle("-fx-fill: rgba(255, 255, 255, 0);");
+        }
     }
 
     private boolean getLockedInState() {

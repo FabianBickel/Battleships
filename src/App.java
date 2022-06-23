@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 
 public class App extends Application {
 
-    final private static int PLAYING_FIELD_SIZE = 9;
+    final private static int PLAYING_FIELD_SIZE = 10;
     final private static int[] SHIP_LENGTHS = { 1, 1, 1, 1, 2, 2, 2, 3, 3, 4 };
     final private static int SHOT_COUNT_TARGET = getShotCountTarget();
 

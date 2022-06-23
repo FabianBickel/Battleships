@@ -27,7 +27,7 @@ public class Ship extends Rectangle {
         this.tilesOccupied = tilesOccupied;
         this.setWidth(shipWidth);
         this.setHeight(shipHeight);
-        // this.setFill(Color.TRANSPARENT);
+        this.setFill(Color.TRANSPARENT);
     }
 
     public boolean getDestroyedState() {

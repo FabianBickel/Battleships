@@ -1,0 +1,1 @@
+java --enable-preview --module-path /Users/Fabia/OneDrive/Files/SDKs/Java/javafx-sdk-18/lib --add-modules javafx.controls,javafx.fxml -jar Battleships.jar
